@@ -14,9 +14,10 @@ class TossPaymentExecutor(
             .uri(URL)
             .bodyValue("""
                 {
-                    "paymentKey":  ${paymentKey},
-                    "orderId":  ${orderId},
-                    "amount":  ${amount},
+                    "paymentKey": "$paymentKey",
+                    "orderId": "$orderId",
+                    "amount": $amount
+                }
             """.trimIndent())
             .retrieve()
             .bodyToMono(String::class.java)
