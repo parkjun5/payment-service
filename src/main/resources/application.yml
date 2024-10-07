@@ -1,0 +1,12 @@
+spring:
+  r2dbc:
+    url: r2dbc:mysql://172.25.166.90:3306/test
+    username: root
+    password: 1234
+  application:
+    name: payment-service
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+  thymeleaf:
+    cache: false
+
