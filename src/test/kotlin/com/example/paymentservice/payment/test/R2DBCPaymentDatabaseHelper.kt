@@ -5,6 +5,7 @@ import com.example.paymentservice.payment.domain.PaymentOrder
 import com.example.paymentservice.payment.domain.PaymentStatus
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.transaction.reactive.TransactionalOperator
+import reactor.core.publisher.GroupedFlux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.math.BigDecimal
@@ -28,23 +29,26 @@ class R2DBCPaymentDatabaseHelper (
                         orderName = result.first()["order_name"] as String,
                         buyerId = result.first()["buyer_id"] as Long,
                         isPaymentDone = (result.first()["is_payment_done"] as Byte).toInt() == 1,
-                        paymentOrders = result.map { result ->
-                            PaymentOrder(
-                                id = result["id"] as Long,
-                                paymentEventId = groupedFlux.key(),
-                                sellerId = result["seller_id"] as Long,
-                                orderId = result["order_id"] as String,
-                                productId = result["product_id"] as Long,
-                                amount = result["amount"] as BigDecimal,
-                                paymentStatus = PaymentStatus.get(result["payment_order_status"] as String),
-                                isLedgerUpdated = (result["ledger_updated"] as Byte).toInt() == 1,
-                                isWalletUpdated = (result["wallet_updated"] as Byte).toInt() == 1,
-                            )
-                        }
+                        paymentOrders = result.map { createPaymentOrder(it, groupedFlux) }
                     )
                 }
             }.toMono().block()
     }
+
+    private fun createPaymentOrder(
+        result: MutableMap<String, Any>,
+        groupedFlux: GroupedFlux<Long, MutableMap<String, Any>>
+    ) = PaymentOrder(
+        id = result["id"] as Long,
+        paymentEventId = groupedFlux.key(),
+        sellerId = result["seller_id"] as Long,
+        orderId = result["order_id"] as String,
+        productId = result["product_id"] as Long,
+        amount = result["amount"] as BigDecimal,
+        paymentStatus = PaymentStatus.get(result["payment_order_status"] as String),
+        isLedgerUpdated = (result["ledger_updated"] as Byte).toInt() == 1,
+        isWalletUpdated = (result["wallet_updated"] as Byte).toInt() == 1,
+    )
 
     override fun clear(): Mono<Void> {
         return deletePaymentOrders()
