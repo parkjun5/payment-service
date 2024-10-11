@@ -1,5 +1,6 @@
 package com.example.paymentservice.payment.domain
 
+@Suppress("UNUSED_PARAMETER")
 enum class PaymentStatus(description: String) {
     NOT_STARTED("결제 승인 시작 전"),
     EXECUTING("결제 승인 중"),

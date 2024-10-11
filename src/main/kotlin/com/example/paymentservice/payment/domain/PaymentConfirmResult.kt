@@ -2,7 +2,7 @@ package com.example.paymentservice.payment.domain
 
 data class PaymentConfirmResult(
     val status: PaymentStatus,
-    val failure: PaymentExecutionFailure? = null,
+    val failure: PaymentFailure? = null,
 ) {
 
     init {
