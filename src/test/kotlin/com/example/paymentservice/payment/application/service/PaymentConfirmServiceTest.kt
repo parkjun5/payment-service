@@ -213,6 +213,7 @@ class PaymentConfirmServiceTest(
             isUnknown = true,
             isRetryable = false
         )
+
         every { mockPaymentExecutorPort.execute(paymentConfirmCommand) }
             .returns(Mono.just(paymentExecutionResult))
 
