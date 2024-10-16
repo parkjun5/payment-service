@@ -1,8 +1,11 @@
 package com.example.paymentservice.payment.adapter.out.persistent.repository
 
 import com.example.paymentservice.payment.domain.PaymentEvent
+import com.example.paymentservice.payment.domain.PendingPaymentEvent
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-fun interface PaymentRepository {
+interface PaymentRepository {
     fun save(paymentEvent: PaymentEvent): Mono<Unit>
+    fun getPendingPayments(): Flux<PendingPaymentEvent>
 }

@@ -109,7 +109,7 @@ class R2DBCPaymentStatusUpdateRepository(
         return selectPaymentOrderStatus(command.orderId)
             .collectList()
             .flatMap { insertPaymentHistory(it, command.status, "PAYMENT_CONFIRMATION_DONE") }
-            .flatMap { updatePaymentOrderStatus(command.paymentKey, command.status) }
+            .flatMap { updatePaymentOrderStatus(command.orderId, command.status) }
             .flatMap { updatePaymentEventExtraDetails(command) }
             .`as`(transactionalOperators::transactional)
             .thenReturn(true)
@@ -119,7 +119,7 @@ class R2DBCPaymentStatusUpdateRepository(
         return selectPaymentOrderStatus(command.orderId)
             .collectList()
             .flatMap { insertPaymentHistory(it, command.status, command.failure.toString()) }
-            .flatMap { updatePaymentOrderStatus(command.paymentKey, command.status) }
+            .flatMap { updatePaymentOrderStatus(command.orderId, command.status) }
             .`as`(transactionalOperators::transactional)
             .thenReturn(true)
     }
@@ -127,8 +127,8 @@ class R2DBCPaymentStatusUpdateRepository(
     private fun updatePaymentStatusToUnknown(command: PaymentStatusUpdateCommand): Mono<Boolean> {
         return selectPaymentOrderStatus(command.orderId)
             .collectList()
-            .flatMap { insertPaymentHistory(it, command.status, "UNKNOWN") }
-            .flatMap { updatePaymentOrderStatus(command.paymentKey, command.status) }
+            .flatMap { insertPaymentHistory(it, command.status, command.failure.toString()) }
+            .flatMap { updatePaymentOrderStatus(command.orderId, command.status) }
             .flatMap { incrementPaymentOrderFailedCount(command) }
             .`as`(transactionalOperators::transactional)
             .thenReturn(true)
